@@ -23,7 +23,7 @@ One command. No extra API keys. Just your existing GitHub Copilot plan.
 
 **Requirements:** [GitHub Copilot subscription](https://github.com/features/copilot) and Node.js 20+
 
-1. **Install GitHub Copilot CLI**
+1. **Install [GitHub Copilot CLI](https://github.com/github/copilot-cli)**
 
     ```bash
     # macOS/Linux
@@ -31,6 +31,10 @@ One command. No extra API keys. Just your existing GitHub Copilot plan.
 
     # Windows
     winget install GitHub.Copilot
+
+    # npm (macOS, Linux, and Windows)
+    npm install -g @github/copilot
+
     ```
 
 2. **Authenticate**
