@@ -21,8 +21,6 @@ One command. No extra API keys. Just your existing GitHub Copilot plan.
 
 ## Quick Start
 
-**Requirements:** [GitHub Copilot subscription](https://github.com/features/copilot) and Node.js 20+
-
 1. **Install [GitHub Copilot CLI](https://github.com/github/copilot-cli)**
 
     ```bash
