@@ -282,19 +282,6 @@ You have AWS Copilot installed which conflicts with GitHub Copilot CLI. Either:
 - Uninstall both GitHub Copilot and AWS Copilot: `brew uninstall copilot-cli`, and then install GitHub Copilot again.
 - Or ensure GitHub Copilot CLI is first in your PATH
 
-## Development
-
-```bash
-# Type check
-npm run typecheck
-
-# Build
-npm run build
-
-# Development with hot reload
-npm run dev
-```
-
 ## License
 
 MIT
