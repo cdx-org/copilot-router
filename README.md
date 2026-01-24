@@ -36,7 +36,9 @@ Use GitHub Copilot as a backend for any client that supports OpenAI or Anthropic
 3. **Run the router**
 
     ```bash
-    npx copilot-router
+    npx copilot-router cc      # Launch Claude Code
+    npx copilot-router cx      # Launch OpenAI Codex
+    npx copilot-router         # Start the router server only
     ```
 
 The server runs at `http://localhost:51741` by default.
@@ -47,7 +49,26 @@ The server runs at `http://localhost:51741` by default.
 
 [Claude Code](https://github.com/anthropics/claude-code) can be configured to use this router as its backend, allowing you to use GitHub Copilot models through Claude Code's interface.
 
-### Setup
+### Quick Launch (Recommended)
+
+The easiest way to use Claude Code with the router - no configuration needed:
+
+```bash
+npx copilot-router claude-code
+# or use the shortcut
+npx copilot-router cc
+```
+
+This starts the router, launches Claude Code with the correct environment variables, and cleans up when you exit. All arguments are passed through:
+
+```bash
+npx copilot-router cc --resume
+npx copilot-router cc --dangerously-skip-permissions
+```
+
+### Manual Setup
+
+If you prefer to run the router separately:
 
 1. **Start the router** (keep it running in a terminal):
    ```bash
@@ -81,7 +102,26 @@ The server runs at `http://localhost:51741` by default.
 
 [OpenAI Codex CLI](https://github.com/openai/codex) can be configured to use this router as a custom model provider.
 
-### Setup
+### Quick Launch (Recommended)
+
+The easiest way to use Codex with the router - no configuration needed:
+
+```bash
+npx copilot-router codex
+# or use the shortcut
+npx copilot-router cx
+```
+
+This starts the router, launches Codex with the correct provider configuration, and cleans up when you exit. All arguments are passed through:
+
+```bash
+npx copilot-router cx --model gpt-4o
+npx copilot-router cx --full-auto "fix the tests"
+```
+
+### Manual Setup
+
+If you prefer to run the router separately:
 
 1. **Start the router** (keep it running in a terminal):
    ```bash
@@ -196,6 +236,22 @@ print(response.content[0].text)
 ```
 
 ## Configuration
+
+### CLI Commands
+
+| Command | Description |
+|---------|-------------|
+| `copilot-router` | Start the router server |
+| `copilot-router claude-code` | Launch Claude Code through the router |
+| `copilot-router cc` | Alias for `claude-code` |
+| `copilot-router codex` | Launch OpenAI Codex through the router |
+| `copilot-router cx` | Alias for `codex` |
+
+**Options:**
+
+- `--port, -p <port>` - Port for the router (default: 51741)
+- `--help, -h` - Show help
+- `--version, -v` - Show version
 
 ### Environment Variables
 
