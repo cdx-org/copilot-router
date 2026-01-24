@@ -9,7 +9,7 @@ import { spawn, ChildProcess } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
 
-const DEFAULT_PORT = 51741;
+const DEFAULT_PORT = 7318;
 const HEALTH_CHECK_TIMEOUT_MS = 30000;
 const HEALTH_CHECK_INTERVAL_MS = 200;
 

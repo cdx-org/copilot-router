@@ -53,7 +53,7 @@ One command. No extra API keys. Just your existing GitHub Copilot plan.
     gcr     # Start the router server only
     ```
 
-    The server will start at `http://localhost:51741`.
+    The server will start at `http://localhost:7318`.
 
 > **Tip:** You can also authenticate via `GITHUB_TOKEN` environment variable with a [PAT](https://github.com/settings/personal-access-tokens/new) that has "Copilot Requests" permission.
 
@@ -91,7 +91,7 @@ If you prefer to run the router separately:
    ```json
    {
     "env": {
-      "ANTHROPIC_BASE_URL": "http://localhost:51741",
+      "ANTHROPIC_BASE_URL": "http://localhost:7318",
       "ANTHROPIC_AUTH_TOKEN": "not-required",
       "ANTHROPIC_API_KEY": "",
       "ANTHROPIC_DEFAULT_HAIKU_MODEL": "github-copilot/claude-haiku-4.5",
@@ -146,7 +146,7 @@ If you prefer to run the router separately:
 
    [model_providers.proxy]
    name = "OpenAI using GitHub Copilot Router"
-   base_url = "http://localhost:51741/v1"
+   base_url = "http://localhost:7318/v1"
    wire_api = "responses"
    ```
 
@@ -181,7 +181,7 @@ If you prefer to run the router separately:
 
 ```bash
 # Non-streaming
-curl http://localhost:51741/v1/chat/completions \
+curl http://localhost:7318/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-4o",
@@ -189,7 +189,7 @@ curl http://localhost:51741/v1/chat/completions \
   }'
 
 # Streaming
-curl http://localhost:51741/v1/chat/completions \
+curl http://localhost:7318/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "gpt-4o",
@@ -201,7 +201,7 @@ curl http://localhost:51741/v1/chat/completions \
 ### With curl (Anthropic format)
 
 ```bash
-curl http://localhost:51741/v1/messages \
+curl http://localhost:7318/v1/messages \
   -H "Content-Type: application/json" \
   -d '{
     "model": "claude-sonnet-4.5",
@@ -216,7 +216,7 @@ curl http://localhost:51741/v1/messages \
 from openai import OpenAI
 
 client = OpenAI(
-    base_url="http://localhost:51741/v1",
+    base_url="http://localhost:7318/v1",
     api_key="not-required"
 )
 
@@ -233,7 +233,7 @@ print(response.choices[0].message.content)
 from anthropic import Anthropic
 
 client = Anthropic(
-    base_url="http://localhost:51741",
+    base_url="http://localhost:7318",
     api_key="not-required"
 )
 
@@ -261,7 +261,7 @@ print(response.content[0].text)
 
 **Options:**
 
-- `--port, -p <port>` - Port for the router (default: 51741)
+- `--port, -p <port>` - Port for the router (default: 7318)
 - `--help, -h` - Show help
 - `--version, -v` - Show version
 
@@ -269,7 +269,7 @@ print(response.content[0].text)
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `PORT` | `51741` | Server port |
+| `PORT` | `7318` | Server port |
 | `GITHUB_TOKEN` | - | GitHub PAT for authentication |
 
 ## Troubleshooting

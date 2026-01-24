@@ -58,14 +58,14 @@ Commands:
   cx             Alias for codex
 
 Server Options:
-  --port, -p <port>  Port to listen on (default: 51741, or PORT env var)
+  --port, -p <port>  Port to listen on (default: 7318, or PORT env var)
 
 Global Options:
   --help, -h         Show this help message
   --version, -v      Show version
 
 Environment Variables:
-  PORT               Server port (default: 51741)
+  PORT               Server port (default: 7318)
   GITHUB_TOKEN       GitHub PAT for authentication (optional if using gh auth)
 
 Examples:

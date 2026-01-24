@@ -32,7 +32,7 @@ app.use("*", prettyJSON());
 app.get("/", (c) => {
   return c.json({
     name: "github-copilot-router",
-    version: "1.1.0",
+    version: "1.2.0",
     description:
       "OpenAI & Anthropic compatible API router for GitHub Copilot SDK",
     endpoints: {
@@ -92,8 +92,7 @@ app.onError((err, c) => {
 });
 
 // Server configuration
-// Using port 51741 (in the dynamic/private range 49152-65535) to avoid conflicts
-const PORT = parseInt(process.env["PORT"] ?? "51741", 10);
+const PORT = parseInt(process.env["PORT"] ?? "7318", 10);
 
 /**
  * Check if the router is already running on the given port
@@ -249,7 +248,7 @@ async function main(): Promise<void> {
 ║    POST /v1/messages/count_tokens - Token counting           ║
 ║                                                              ║
 ║  Usage:                                                      ║
-║    base_url: http://localhost:${PORT}/v1                       ║
+║    base_url: http://localhost:${PORT}/v1                        ║
 ║    api_key: "not-required" (uses Copilot auth)               ║
 ╚══════════════════════════════════════════════════════════════╝
 `);
