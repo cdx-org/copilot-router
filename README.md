@@ -75,11 +75,15 @@ The server runs at `http://localhost:51741` by default.
 
 | Endpoint | Method | Format | Description |
 |----------|--------|--------|-------------|
-| `/v1/chat/completions` | POST | OpenAI | Chat completions |
+| `/v1/responses` | POST | OpenAI | Responses API (recommended) |
+| `/v1/responses/input_tokens` | POST | OpenAI | Token counting |
+| `/v1/chat/completions` | POST | OpenAI | Chat completions (legacy) |
 | `/v1/models` | GET | OpenAI | List available models |
 | `/v1/messages` | POST | Anthropic | Messages API |
 | `/v1/messages/count_tokens` | POST | Anthropic | Token counting |
 | `/health` | GET | - | Health check |
+
+> **Note:** The `/v1/responses` endpoint is the newer OpenAI Responses API format, which is recommended over `/v1/chat/completions`. Some clients like OpenAI Codex CLI use `wire_api = "responses"` configuration.
 
 ## Integration with Claude Code
 
@@ -114,6 +118,40 @@ Claude Code can be configured to use this router as its backend, allowing you to
 - `ANTHROPIC_AUTH_TOKEN` can be any non-empty string (authentication is handled by GitHub Copilot)
 - `ANTHROPIC_API_KEY` should be empty or omitted
 - Model names in the config should match models available in GitHub Copilot
+
+## Integration with OpenAI Codex CLI
+
+[OpenAI Codex CLI](https://github.com/openai/codex) can be configured to use this router as a custom model provider.
+
+### Setup
+
+1. **Start the router** (keep it running in a terminal):
+   ```bash
+   npm run dev
+   ```
+
+2. **Configure Codex CLI** by creating/editing `~/.codex/config.toml`:
+
+   ```toml
+   model = "gpt-5.2-codex"
+   model_provider = "proxy"
+
+   [model_providers.proxy]
+   name = "OpenAI using GitHub Copilot Router"
+   base_url = "http://localhost:51741/v1"
+   wire_api = "responses"
+   ```
+
+3. **Run Codex** as normal:
+   ```bash
+   codex
+   ```
+   It will now route requests through GitHub Copilot.
+
+### Notes
+
+- Model name should match a model available in GitHub Copilot (e.g., `gpt-5.2-codex`, `gpt-4o`, `claude-sonnet-4.5`)
+- No API key configuration needed - authentication is handled by GitHub Copilot
 
 ## Usage Examples
 
