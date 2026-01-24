@@ -32,7 +32,7 @@ app.use("*", prettyJSON());
 app.get("/", (c) => {
   return c.json({
     name: "github-copilot-router",
-    version: "1.2.0",
+    version: "1.2.1",
     description:
       "OpenAI & Anthropic compatible API router for GitHub Copilot SDK",
     endpoints: {

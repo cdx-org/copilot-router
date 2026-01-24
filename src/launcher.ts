@@ -5,9 +5,10 @@
  * and managing the full lifecycle.
  */
 
-import { spawn, ChildProcess } from "node:child_process";
+import { ChildProcess } from "node:child_process";
 import { fileURLToPath } from "node:url";
 import path from "node:path";
+import spawn from "cross-spawn";
 
 const DEFAULT_PORT = 7318;
 const HEALTH_CHECK_TIMEOUT_MS = 30000;

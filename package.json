@@ -1,6 +1,6 @@
 {
   "name": "github-copilot-router",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "OpenAI & Anthropic compatible API router for GitHub Copilot SDK - Use Copilot with Claude Code, OpenAI Codex CLI, and more",
   "type": "module",
   "main": "dist/index.js",
@@ -47,10 +47,12 @@
   "dependencies": {
     "@github/copilot-sdk": "^0.1.17",
     "@hono/node-server": "^1.13.7",
+    "cross-spawn": "^7.0.6",
     "hono": "^4.6.14",
     "uuid": "^11.0.4"
   },
   "devDependencies": {
+    "@types/cross-spawn": "^6.0.6",
     "@types/node": "^22.10.5",
     "@types/uuid": "^10.0.0",
     "tsx": "^4.19.2",
