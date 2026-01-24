@@ -1,15 +1,48 @@
 {
   "name": "github-copilot-router",
   "version": "1.0.0",
-  "description": "OpenAI-compatible API router for GitHub Copilot SDK",
+  "description": "OpenAI & Anthropic compatible API router for GitHub Copilot SDK - Use Copilot with Claude Code, OpenAI Codex CLI, and more",
   "type": "module",
   "main": "dist/index.js",
+  "bin": {
+    "copilot-router": "./dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepublishOnly": "npm run build"
   },
+  "keywords": [
+    "github-copilot",
+    "openai",
+    "anthropic",
+    "claude",
+    "api",
+    "router",
+    "proxy",
+    "llm",
+    "ai",
+    "copilot",
+    "claude-code",
+    "codex"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yatfuchan/github-copilot-router.git"
+  },
+  "homepage": "https://github.com/yatfuchan/github-copilot-router#readme",
+  "bugs": {
+    "url": "https://github.com/yatfuchan/github-copilot-router/issues"
+  },
+  "author": "yatfuchan",
+  "license": "MIT",
   "dependencies": {
     "@github/copilot-sdk": "^0.1.17",
     "@hono/node-server": "^1.13.7",

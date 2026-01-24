@@ -63,19 +63,11 @@ gh auth login
 ## Quick Start
 
 ```bash
-# Clone the repository
-git clone <repo-url>
-cd github-copilot-router
+# Run directly without installation
+npx copilot-router
 
-# Install dependencies
-npm install
-
-# Start the server (development mode with hot reload)
-npm run dev
-
-# Or build and run production
-npm run build
-npm start
+# Or with a custom port
+npx copilot-router --port 8080
 ```
 
 The server runs at `http://localhost:51741` by default.
@@ -102,7 +94,7 @@ Claude Code can be configured to use this router as its backend, allowing you to
 
 1. **Start the router** (keep it running in a terminal):
    ```bash
-   npm run dev
+   npx copilot-router
    ```
 
 2. **Configure Claude Code** by creating/editing `.claude/settings.json` in your project:
@@ -136,7 +128,7 @@ Claude Code can be configured to use this router as its backend, allowing you to
 
 1. **Start the router** (keep it running in a terminal):
    ```bash
-   npm run dev
+   npx copilot-router
    ```
 
 2. **Configure Codex CLI** by creating/editing `~/.codex/config.toml`:
