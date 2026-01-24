@@ -43,7 +43,7 @@ The server runs at `http://localhost:51741` by default.
 
 > **Tip:** You can also authenticate via `GITHUB_TOKEN` environment variable with a [PAT](https://github.com/settings/personal-access-tokens/new) that has "Copilot Requests" permission.
 
-## Integration with Claude Code
+## Claude Code Integration
 
 [Claude Code](https://github.com/anthropics/claude-code) can be configured to use this router as its backend, allowing you to use GitHub Copilot models through Claude Code's interface.
 
@@ -77,7 +77,7 @@ The server runs at `http://localhost:51741` by default.
 - `ANTHROPIC_API_KEY` should be empty or omitted
 - Model names in the config should match models available in GitHub Copilot
 
-## Integration with OpenAI Codex CLI
+## OpenAI Codex Integration
 
 [OpenAI Codex CLI](https://github.com/openai/codex) can be configured to use this router as a custom model provider.
 
