@@ -11,14 +11,6 @@
 
 Use GitHub Copilot as a backend for any client that supports OpenAI or Anthropic APIs, including **Claude Code** and **OpenAI Codex**.
 
-## Features
-
-- **OpenAI API compatible** (`/v1/chat/completions`, `/v1/models`)
-- **Anthropic API compatible** (`/v1/messages`, `/v1/messages/count_tokens`)
-- **Streaming support** for both API formats
-- **Dynamic model listing** from Copilot SDK
-- **Authentication check** at startup with helpful error messages
-
 ## Prerequisites
 
 1. **GitHub Copilot CLI** installed
@@ -40,25 +32,13 @@ winget install GitHub.Copilot
 
 ### Authenticate with GitHub Copilot
 
-**Option 1: Interactive login**
 ```bash
 copilot
 # Inside the CLI, type:
 /login
 ```
 
-**Option 2: Environment variable**
-
-Create a Personal Access Token (PAT) with "Copilot Requests" permission at https://github.com/settings/personal-access-tokens/new
-
-```bash
-export GITHUB_TOKEN=github_pat_xxxxxxxxxxxx
-```
-
-**Option 3: GitHub CLI (if already authenticated)**
-```bash
-gh auth login
-```
+You can also set the `GITHUB_TOKEN` environment variable. Create a Personal Access Token (PAT) with "Copilot Requests" permission at https://github.com/settings/personal-access-tokens/new
 
 ## Quick Start
 
@@ -71,20 +51,6 @@ npx copilot-router --port 8080
 ```
 
 The server runs at `http://localhost:51741` by default.
-
-## API Endpoints
-
-| Endpoint | Method | Format | Description |
-|----------|--------|--------|-------------|
-| `/v1/responses` | POST | OpenAI | Responses API (recommended) |
-| `/v1/responses/input_tokens` | POST | OpenAI | Token counting |
-| `/v1/chat/completions` | POST | OpenAI | Chat completions (legacy) |
-| `/v1/models` | GET | OpenAI | List available models |
-| `/v1/messages` | POST | Anthropic | Messages API |
-| `/v1/messages/count_tokens` | POST | Anthropic | Token counting |
-| `/health` | GET | - | Health check |
-
-> **Note:** The `/v1/responses` endpoint is the newer OpenAI Responses API format, which is recommended over `/v1/chat/completions`. Some clients like OpenAI Codex CLI use `wire_api = "responses"` configuration.
 
 ## Integration with Claude Code
 
@@ -101,14 +67,14 @@ Claude Code can be configured to use this router as its backend, allowing you to
 
    ```json
    {
-     "env": {
-       "ANTHROPIC_BASE_URL": "http://localhost:51741",
-       "ANTHROPIC_AUTH_TOKEN": "<ANY-STRING>",
-       "ANTHROPIC_API_KEY": "",
-       "ANTHROPIC_DEFAULT_HAIKU_MODEL": "claude-sonnet-4",
-       "ANTHROPIC_DEFAULT_SONNET_MODEL": "claude-sonnet-4.5",
-       "ANTHROPIC_DEFAULT_OPUS_MODEL": "gpt-5"
-     }
+    "env": {
+      "ANTHROPIC_BASE_URL": "http://localhost:51741",
+      "ANTHROPIC_AUTH_TOKEN": "not-required",
+      "ANTHROPIC_API_KEY": "",
+      "ANTHROPIC_DEFAULT_HAIKU_MODEL": "github-copilot/claude-haiku-4.5",
+      "ANTHROPIC_DEFAULT_SONNET_MODEL": "github-copilot/claude-sonnet-4.5",
+      "ANTHROPIC_DEFAULT_OPUS_MODEL": "github-copilot/claude-opus-4.5"
+    }
    }
    ```
 
@@ -153,6 +119,20 @@ Claude Code can be configured to use this router as its backend, allowing you to
 
 - Model name should match a model available in GitHub Copilot (e.g., `gpt-5.2-codex`, `gpt-4o`, `claude-sonnet-4.5`)
 - No API key configuration needed - authentication is handled by GitHub Copilot
+
+## API Endpoints
+
+| Endpoint | Method | Format | Description |
+|----------|--------|--------|-------------|
+| `/v1/responses` | POST | OpenAI | Responses API (recommended) |
+| `/v1/responses/input_tokens` | POST | OpenAI | Token counting |
+| `/v1/chat/completions` | POST | OpenAI | Chat completions (legacy) |
+| `/v1/models` | GET | OpenAI | List available models |
+| `/v1/messages` | POST | Anthropic | Messages API |
+| `/v1/messages/count_tokens` | POST | Anthropic | Token counting |
+| `/health` | GET | - | Health check |
+
+> **Note:** The `/v1/responses` endpoint is the newer OpenAI Responses API format, which is recommended over `/v1/chat/completions`. Some clients like OpenAI Codex CLI use `wire_api = "responses"` configuration.
 
 ## Usage Examples
 
