@@ -5,7 +5,7 @@
 # GitHub Copilot Router
 
 <p align="center">
-  <a href="https://github.com/yatfuchan/github-copilot-router/blob/main/LICENSE">
+  <a href="https://github.com/ocmrz/github-copilot-router/blob/main/LICENSE">
     <img src="https://img.shields.io/npm/l/github-copilot-router" alt="License">
   </a>
   <a href="https://www.npmjs.com/package/github-copilot-router">
