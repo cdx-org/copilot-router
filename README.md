@@ -282,14 +282,6 @@ You have AWS Copilot installed which conflicts with GitHub Copilot CLI. Either:
 - Uninstall both GitHub Copilot and AWS Copilot: `brew uninstall copilot-cli`, and then install GitHub Copilot again.
 - Or ensure GitHub Copilot CLI is first in your PATH
 
-### Server doesn't exit after auth error
-
-This was fixed - the server now properly shuts down the Copilot CLI process before exiting.
-
-### 404 errors with Claude Code
-
-Make sure you're using the Anthropic API endpoints (`/v1/messages`), not just OpenAI endpoints. The router supports both.
-
 ## Development
 
 ```bash
