@@ -5,11 +5,19 @@
 # GitHub Copilot Router
 
 <p align="center">
-  <strong>OpenAI & Anthropic API proxy for GitHub Copilot SDK</strong>
+  <a href="https://github.com/yatfuchan/github-copilot-router/blob/main/LICENSE">
+    <img src="https://img.shields.io/npm/l/github-copilot-router" alt="License">
+  </a>
+  <a href="https://www.npmjs.com/package/github-copilot-router">
+    <img src="https://img.shields.io/npm/v/github-copilot-router" alt="NPM Version">
+  </a>
 </p>
 
+<p align="center">
+  Run <strong>Claude Code</strong> and <strong>OpenAI Codex</strong> with your Copilot subscription.
+</p>
 
-Use GitHub Copilot as a backend for any client that supports OpenAI or Anthropic APIs, including **Claude Code** and **OpenAI Codex**.
+One command. No extra API keys. Just your existing GitHub Copilot plan.
 
 ## Quick Start
 
@@ -36,12 +44,12 @@ Use GitHub Copilot as a backend for any client that supports OpenAI or Anthropic
 3. **Run the router**
 
     ```bash
-    npx copilot-router cc      # Launch Claude Code
-    npx copilot-router cx      # Launch OpenAI Codex
-    npx copilot-router         # Start the router server only
+    npx copilot-router cc  # Launch Claude Code
+    npx copilot-router cx  # Launch OpenAI Codex
+    npx copilot-router     # Start the router server only
     ```
 
-The server runs at `http://localhost:51741` by default.
+    The server will start at `http://localhost:51741`.
 
 > **Tip:** You can also authenticate via `GITHUB_TOKEN` environment variable with a [PAT](https://github.com/settings/personal-access-tokens/new) that has "Copilot Requests" permission.
 
