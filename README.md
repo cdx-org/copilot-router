@@ -43,18 +43,14 @@ You can also set the `GITHUB_TOKEN` environment variable. Create a Personal Acce
 ## Quick Start
 
 ```bash
-# Run directly without installation
 npx copilot-router
-
-# Or with a custom port
-npx copilot-router --port 8080
 ```
 
 The server runs at `http://localhost:51741` by default.
 
 ## Integration with Claude Code
 
-Claude Code can be configured to use this router as its backend, allowing you to use GitHub Copilot models through Claude Code's interface.
+[Claude Code](https://github.com/anthropics/claude-code) can be configured to use this router as its backend, allowing you to use GitHub Copilot models through Claude Code's interface.
 
 ### Setup
 
