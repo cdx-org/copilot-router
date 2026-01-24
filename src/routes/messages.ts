@@ -46,6 +46,9 @@ function isErrorEvent(
 
 /**
  * Convert Anthropic messages to a prompt for Copilot SDK
+ *
+ * Since we create a new session per request (stateless API pattern),
+ * we must include the full conversation history in the prompt.
  */
 function messagesToPrompt(
   messages: AnthropicMessage[],
@@ -72,24 +75,9 @@ function messagesToPrompt(
     }
   }
 
-  // Get the last user message as the main prompt
-  const lastUserMessage = messages.filter((m) => m.role === "user").pop();
-  let prompt: string;
-
-  if (lastUserMessage) {
-    prompt =
-      typeof lastUserMessage.content === "string"
-        ? lastUserMessage.content
-        : lastUserMessage.content
-            .filter(
-              (block): block is AnthropicContentBlock & { text: string } =>
-                block.type === "text" && typeof block.text === "string",
-            )
-            .map((block) => block.text)
-            .join("\n");
-  } else {
-    prompt = conversationParts.join("\n");
-  }
+  // Include full conversation history as the prompt
+  // This is necessary because we create a new session per request
+  const prompt = conversationParts.join("\n\n");
 
   return { systemMessage, prompt };
 }

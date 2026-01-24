@@ -43,6 +43,9 @@ function isErrorEvent(
 
 /**
  * Convert Responses API input to a prompt for Copilot SDK
+ *
+ * Since we create a new session per request (stateless API pattern),
+ * we must include the full conversation history in the prompt.
  */
 function inputToPrompt(
   input: string | ResponseInputItem[],
@@ -86,27 +89,9 @@ function inputToPrompt(
       }
     }
 
-    // Get the last user message as the main prompt
-    const lastUserItem = input
-      .filter((item) => item.type === "message" && item.role === "user")
-      .pop();
-
-    if (lastUserItem && lastUserItem.type === "message") {
-      if (typeof lastUserItem.content === "string") {
-        prompt = lastUserItem.content;
-      } else {
-        prompt = lastUserItem.content
-          .filter(
-            (block): block is ResponseContentBlock & { text: string } =>
-              (block.type === "input_text" || block.type === "text") &&
-              typeof block.text === "string",
-          )
-          .map((block) => block.text)
-          .join("\n");
-      }
-    } else {
-      prompt = conversationParts.join("\n");
-    }
+    // Include full conversation history as the prompt
+    // This is necessary because we create a new session per request
+    prompt = conversationParts.join("\n\n");
   }
 
   return { systemMessage, prompt };

@@ -44,6 +44,9 @@ const chat = new Hono();
 
 /**
  * Convert OpenAI messages to a single prompt for Copilot SDK
+ *
+ * Since we create a new session per request (stateless API pattern),
+ * we must include the full conversation history in the prompt.
  */
 function messagesToPrompt(messages: ChatMessage[]): {
   systemMessage: string | undefined;
@@ -75,9 +78,9 @@ function messagesToPrompt(messages: ChatMessage[]): {
     }
   }
 
-  // Get the last user message as the main prompt
-  const lastUserMessage = messages.filter((m) => m.role === "user").pop();
-  const prompt = lastUserMessage?.content ?? conversationParts.join("\n");
+  // Include full conversation history as the prompt
+  // This is necessary because we create a new session per request
+  const prompt = conversationParts.join("\n\n");
 
   return { systemMessage, prompt };
 }
