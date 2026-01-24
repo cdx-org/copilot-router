@@ -19,6 +19,19 @@ interface LaunchOptions {
 }
 
 /**
+ * Check if the router is already running on the given port
+ */
+export async function isServerRunning(port: number): Promise<boolean> {
+  const url = `http://localhost:${port}/health`;
+  try {
+    const response = await fetch(url);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
+/**
  * Wait for the router's health endpoint to respond
  */
 async function waitForHealth(port: number, timeoutMs: number): Promise<void> {
@@ -73,24 +86,32 @@ function startRouter(port: number): ChildProcess {
 export async function launchClaudeCode(options: LaunchOptions): Promise<number> {
   const port = options.port ?? DEFAULT_PORT;
 
-  console.log("Starting Copilot Router...");
-  const routerProcess = startRouter(port);
-
-  // Handle router crash
+  // Check if router is already running
+  const serverAlreadyRunning = await isServerRunning(port);
+  let routerProcess: ChildProcess | null = null;
   let routerExited = false;
-  routerProcess.on("exit", (code) => {
-    routerExited = true;
-    if (code !== 0 && code !== null) {
-      console.error(`Router exited unexpectedly with code ${code}`);
-    }
-  });
 
-  try {
-    await waitForHealth(port, HEALTH_CHECK_TIMEOUT_MS);
-    console.log(`Router ready at http://localhost:${port}`);
-  } catch (error) {
-    routerProcess.kill("SIGTERM");
-    throw error;
+  if (serverAlreadyRunning) {
+    console.log(`Using existing Copilot Router at http://localhost:${port}`);
+  } else {
+    console.log("Starting Copilot Router...");
+    routerProcess = startRouter(port);
+
+    // Handle router crash
+    routerProcess.on("exit", (code) => {
+      routerExited = true;
+      if (code !== 0 && code !== null) {
+        console.error(`Router exited unexpectedly with code ${code}`);
+      }
+    });
+
+    try {
+      await waitForHealth(port, HEALTH_CHECK_TIMEOUT_MS);
+      console.log(`Router ready at http://localhost:${port}`);
+    } catch (error) {
+      routerProcess.kill("SIGTERM");
+      throw error;
+    }
   }
 
   // Environment variables for Claude Code
@@ -110,7 +131,8 @@ export async function launchClaudeCode(options: LaunchOptions): Promise<number> 
 
   return new Promise<number>((resolve) => {
     const cleanup = (exitCode: number): void => {
-      if (!routerExited) {
+      // Only kill the router if we started it
+      if (routerProcess && !routerExited) {
         routerProcess.kill("SIGTERM");
       }
       resolve(exitCode);
@@ -135,13 +157,15 @@ export async function launchClaudeCode(options: LaunchOptions): Promise<number> 
     process.on("SIGINT", () => forwardSignal("SIGINT"));
     process.on("SIGTERM", () => forwardSignal("SIGTERM"));
 
-    // Handle router crash while CLI is running
-    routerProcess.on("exit", (code) => {
-      if (code !== 0 && code !== null) {
-        console.error("\nRouter crashed. Terminating Claude Code...");
-        claudeProcess.kill("SIGTERM");
-      }
-    });
+    // Handle router crash while CLI is running (only if we started it)
+    if (routerProcess) {
+      routerProcess.on("exit", (code) => {
+        if (code !== 0 && code !== null) {
+          console.error("\nRouter crashed. Terminating Claude Code...");
+          claudeProcess.kill("SIGTERM");
+        }
+      });
+    }
   });
 }
 
@@ -151,24 +175,32 @@ export async function launchClaudeCode(options: LaunchOptions): Promise<number> 
 export async function launchCodex(options: LaunchOptions): Promise<number> {
   const port = options.port ?? DEFAULT_PORT;
 
-  console.log("Starting Copilot Router...");
-  const routerProcess = startRouter(port);
-
-  // Handle router crash
+  // Check if router is already running
+  const serverAlreadyRunning = await isServerRunning(port);
+  let routerProcess: ChildProcess | null = null;
   let routerExited = false;
-  routerProcess.on("exit", (code) => {
-    routerExited = true;
-    if (code !== 0 && code !== null) {
-      console.error(`Router exited unexpectedly with code ${code}`);
-    }
-  });
 
-  try {
-    await waitForHealth(port, HEALTH_CHECK_TIMEOUT_MS);
-    console.log(`Router ready at http://localhost:${port}`);
-  } catch (error) {
-    routerProcess.kill("SIGTERM");
-    throw error;
+  if (serverAlreadyRunning) {
+    console.log(`Using existing Copilot Router at http://localhost:${port}`);
+  } else {
+    console.log("Starting Copilot Router...");
+    routerProcess = startRouter(port);
+
+    // Handle router crash
+    routerProcess.on("exit", (code) => {
+      routerExited = true;
+      if (code !== 0 && code !== null) {
+        console.error(`Router exited unexpectedly with code ${code}`);
+      }
+    });
+
+    try {
+      await waitForHealth(port, HEALTH_CHECK_TIMEOUT_MS);
+      console.log(`Router ready at http://localhost:${port}`);
+    } catch (error) {
+      routerProcess.kill("SIGTERM");
+      throw error;
+    }
   }
 
   // Build Codex args with inline config (TOML inline table format)
@@ -188,7 +220,8 @@ export async function launchCodex(options: LaunchOptions): Promise<number> {
 
   return new Promise<number>((resolve) => {
     const cleanup = (exitCode: number): void => {
-      if (!routerExited) {
+      // Only kill the router if we started it
+      if (routerProcess && !routerExited) {
         routerProcess.kill("SIGTERM");
       }
       resolve(exitCode);
@@ -213,12 +246,14 @@ export async function launchCodex(options: LaunchOptions): Promise<number> {
     process.on("SIGINT", () => forwardSignal("SIGINT"));
     process.on("SIGTERM", () => forwardSignal("SIGTERM"));
 
-    // Handle router crash while CLI is running
-    routerProcess.on("exit", (code) => {
-      if (code !== 0 && code !== null) {
-        console.error("\nRouter crashed. Terminating Codex...");
-        codexProcess.kill("SIGTERM");
-      }
-    });
+    // Handle router crash while CLI is running (only if we started it)
+    if (routerProcess) {
+      routerProcess.on("exit", (code) => {
+        if (code !== 0 && code !== null) {
+          console.error("\nRouter crashed. Terminating Codex...");
+          codexProcess.kill("SIGTERM");
+        }
+      });
+    }
   });
 }

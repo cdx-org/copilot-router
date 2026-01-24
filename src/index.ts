@@ -95,8 +95,38 @@ app.onError((err, c) => {
 // Using port 51741 (in the dynamic/private range 49152-65535) to avoid conflicts
 const PORT = parseInt(process.env["PORT"] ?? "51741", 10);
 
+/**
+ * Check if the router is already running on the given port
+ */
+async function isServerRunning(port: number): Promise<boolean> {
+  const url = `http://localhost:${port}/health`;
+  try {
+    const response = await fetch(url);
+    return response.ok;
+  } catch {
+    return false;
+  }
+}
+
 // Start server
 async function main(): Promise<void> {
+  // Check if server is already running
+  const serverAlreadyRunning = await isServerRunning(PORT);
+  if (serverAlreadyRunning) {
+    console.log(`
+╔══════════════════════════════════════════════════════════════╗
+║            Copilot Router is already running!                ║
+╠══════════════════════════════════════════════════════════════╣
+║  Server detected at: http://localhost:${PORT.toString().padEnd(24)}║
+║                                                              ║
+║  The router is already serving requests on this port.        ║
+║  You can use 'copilot-router cc' or 'copilot-router cx'      ║
+║  to launch CLI tools that will connect to this server.       ║
+╚══════════════════════════════════════════════════════════════╝
+`);
+    process.exit(0);
+  }
+
   console.log("Initializing GitHub Copilot SDK client...");
 
   try {
