@@ -11,42 +11,37 @@
 
 Use GitHub Copilot as a backend for any client that supports OpenAI or Anthropic APIs, including **Claude Code** and **OpenAI Codex**.
 
-## Prerequisites
-
-1. **GitHub Copilot CLI** installed
-2. **GitHub Copilot subscription** (Individual, Business, or Enterprise)
-3. **Node.js 20+**
-
-### Install GitHub Copilot CLI
-
-```bash
-# macOS/Linux via Homebrew
-brew install copilot-cli
-
-# Or via npm
-npm install -g @github/copilot
-
-# Windows via WinGet
-winget install GitHub.Copilot
-```
-
-### Authenticate with GitHub Copilot
-
-```bash
-copilot
-# Inside the CLI, type:
-/login
-```
-
-You can also set the `GITHUB_TOKEN` environment variable. Create a Personal Access Token (PAT) with "Copilot Requests" permission at https://github.com/settings/personal-access-tokens/new
-
 ## Quick Start
 
-```bash
-npx copilot-router
-```
+**Requirements:** [GitHub Copilot subscription](https://github.com/features/copilot) and Node.js 20+
+
+1. **Install GitHub Copilot CLI**
+
+    ```bash
+    # macOS/Linux
+    brew install copilot-cli
+
+    # Windows
+    winget install GitHub.Copilot
+    ```
+
+2. **Authenticate**
+
+    ```bash
+    copilot
+    # Inside the CLI, type:
+    /login
+    ```
+
+3. **Run the router**
+
+    ```bash
+    npx copilot-router
+    ```
 
 The server runs at `http://localhost:51741` by default.
+
+> **Tip:** You can also authenticate via `GITHUB_TOKEN` environment variable with a [PAT](https://github.com/settings/personal-access-tokens/new) that has "Copilot Requests" permission.
 
 ## Integration with Claude Code
 
