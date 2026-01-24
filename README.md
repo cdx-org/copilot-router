@@ -41,12 +41,14 @@ One command. No extra API keys. Just your existing GitHub Copilot plan.
     /login
     ```
 
-3. **Run the router**
+3. **Install and run**
 
     ```bash
-    npx copilot-router cc  # Launch Claude Code
-    npx copilot-router cx  # Launch OpenAI Codex
-    npx copilot-router     # Start the router server only
+    npm install -g github-copilot-router
+
+    gcr cc  # Launch Claude Code
+    gcr cx  # Launch OpenAI Codex
+    gcr     # Start the router server only
     ```
 
     The server will start at `http://localhost:51741`.
@@ -62,16 +64,15 @@ One command. No extra API keys. Just your existing GitHub Copilot plan.
 The easiest way to use Claude Code with the router - no configuration needed:
 
 ```bash
-npx copilot-router claude-code
-# or use the shortcut
-npx copilot-router cc
+gcr cc
+# or: gcr claude-code
 ```
 
 This starts the router, launches Claude Code with the correct environment variables, and cleans up when you exit. All arguments are passed through:
 
 ```bash
-npx copilot-router cc --resume
-npx copilot-router cc --dangerously-skip-permissions
+gcr cc --resume
+gcr cc --dangerously-skip-permissions
 ```
 
 ### Manual Setup
@@ -80,7 +81,7 @@ If you prefer to run the router separately:
 
 1. **Start the router** (keep it running in a terminal):
    ```bash
-   npx copilot-router
+   gcr
    ```
 
 2. **Configure Claude Code** by creating/editing `.claude/settings.json` in your project:
@@ -115,16 +116,15 @@ If you prefer to run the router separately:
 The easiest way to use Codex with the router - no configuration needed:
 
 ```bash
-npx copilot-router codex
-# or use the shortcut
-npx copilot-router cx
+gcr cx
+# or: gcr codex
 ```
 
 This starts the router, launches Codex with the correct provider configuration, and cleans up when you exit. All arguments are passed through:
 
 ```bash
-npx copilot-router cx --model gpt-4o
-npx copilot-router cx --full-auto "fix the tests"
+gcr cx --model gpt-4o
+gcr cx --full-auto "fix the tests"
 ```
 
 ### Manual Setup
@@ -133,7 +133,7 @@ If you prefer to run the router separately:
 
 1. **Start the router** (keep it running in a terminal):
    ```bash
-   npx copilot-router
+   gcr
    ```
 
 2. **Configure Codex CLI** by creating/editing `~/.codex/config.toml`:
@@ -249,11 +249,13 @@ print(response.content[0].text)
 
 | Command | Description |
 |---------|-------------|
-| `copilot-router` | Start the router server |
-| `copilot-router claude-code` | Launch Claude Code through the router |
-| `copilot-router cc` | Alias for `claude-code` |
-| `copilot-router codex` | Launch OpenAI Codex through the router |
-| `copilot-router cx` | Alias for `codex` |
+| `gcr` | Start the router server |
+| `gcr claude-code` | Launch Claude Code through the router |
+| `gcr cc` | Alias for `claude-code` |
+| `gcr codex` | Launch OpenAI Codex through the router |
+| `gcr cx` | Alias for `codex` |
+
+> **Note:** `copilot-router` is an alias for `gcr` (e.g., `copilot-router cc` works too).
 
 **Options:**
 
