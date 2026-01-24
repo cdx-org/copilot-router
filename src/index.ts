@@ -13,6 +13,7 @@ import { prettyJSON } from "hono/pretty-json";
 import chatRoutes from "./routes/chat.js";
 import modelsRoutes from "./routes/models.js";
 import messagesRoutes from "./routes/messages.js";
+import responsesRoutes from "./routes/responses.js";
 import {
   shutdownClient,
   destroyAllSessions,
@@ -35,8 +36,10 @@ app.get("/", (c) => {
     description:
       "OpenAI & Anthropic compatible API router for GitHub Copilot SDK",
     endpoints: {
-      // OpenAI format
+      // OpenAI format (Chat Completions - legacy)
       chat_completions: "/v1/chat/completions",
+      // OpenAI format (Responses API - recommended)
+      responses: "/v1/responses",
       models: "/v1/models",
       // Anthropic format
       messages: "/v1/messages",
@@ -51,6 +54,7 @@ app.get("/health", (c) => {
 
 // OpenAI-compatible routes
 app.route("/v1/chat/completions", chatRoutes);
+app.route("/v1/responses", responsesRoutes);
 app.route("/v1/models", modelsRoutes);
 
 // Anthropic-compatible routes
@@ -206,7 +210,8 @@ async function main(): Promise<void> {
 ║  Server running at: http://localhost:${PORT.toString().padEnd(24)}║
 ║                                                              ║
 ║  OpenAI Endpoints:                                           ║
-║    POST /v1/chat/completions  - Chat completions             ║
+║    POST /v1/responses         - Responses API (recommended)  ║
+║    POST /v1/chat/completions  - Chat completions (legacy)    ║
 ║    GET  /v1/models            - List models                  ║
 ║                                                              ║
 ║  Anthropic Endpoints:                                        ║
