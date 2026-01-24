@@ -72,7 +72,7 @@ This router translates OpenAI and Anthropic API formats to GitHub Copilot SDK ca
     npm install -g github-copilot-router
     gcr     # Start the router server
 
-    # Experimental
+    # Deprecated
     gcr cc  # Launch Claude Code
     gcr cx  # Launch OpenAI Codex
     ```
@@ -177,10 +177,10 @@ curl http://localhost:7318/v1/messages \
 - OpenAI Codex CLI (its tools don't work; Copilot's tools run on the router's machine instead)
 - Any agentic tool expecting client-side tool execution
 
-## Experimental: Claude Code & Codex Launchers
+## Deprecated: Claude Code & Codex Launchers
 
 > [!CAUTION]
-> **These launchers are experimental and have significant limitations.**
+> **These launchers are deprecated and have significant limitations.**
 >
 > Claude Code and Codex CLI expect to control file operations through their own tools. With this router:
 >
