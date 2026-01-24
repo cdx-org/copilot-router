@@ -14,10 +14,33 @@
 </p>
 
 <p align="center">
-  Run <strong>Claude Code</strong> and <strong>OpenAI Codex</strong> with your Copilot subscription.
+  OpenAI & Anthropic compatible chat proxy for GitHub Copilot models.
 </p>
 
-One command. No extra API keys. Just your existing GitHub Copilot plan.
+Use your existing GitHub Copilot subscription with standard OpenAI and Anthropic client libraries.
+
+> [!WARNING]
+> **This is a chat completion proxy, not a full API replacement.**
+>
+> - **Tool/function calling is NOT passed through** - client tool definitions are ignored
+> - **Copilot has its own tools** - file operations happen on the **router's machine/directory**, not the client's
+> - **Claude Code/Codex tools don't work** - their file/shell tools never get invoked; Copilot's tools run instead
+> - **Best for:** Chat applications, simple completions, Q&A bots, prototyping
+> - **Not for:** Agentic coding assistants expecting client-side tool execution
+
+## What This Does
+
+This router translates OpenAI and Anthropic API formats to GitHub Copilot SDK calls, allowing you to:
+
+- Use `openai` and `anthropic` Python/JS libraries with Copilot models
+- Access Claude, GPT, and Gemini models through your Copilot subscription
+- Build chat applications without managing multiple API keys
+
+## What This Does NOT Do
+
+- Pass through tool/function calls to clients (Copilot executes tools server-side instead)
+- Let Claude Code/Codex control file operations (Copilot's tools run in the router's directory)
+- Replace direct API access for agentic tools that need client-side tool execution
 
 ## Quick Start
 
@@ -47,168 +70,18 @@ One command. No extra API keys. Just your existing GitHub Copilot plan.
 
     ```bash
     npm install -g github-copilot-router
+    gcr     # Start the router server
 
+    # Experimental
     gcr cc  # Launch Claude Code
     gcr cx  # Launch OpenAI Codex
-    gcr     # Start the router server only
     ```
 
     The server will start at `http://localhost:7318`.
 
 > **Tip:** You can also authenticate via `GITHUB_TOKEN` environment variable with a [PAT](https://github.com/settings/personal-access-tokens/new) that has "Copilot Requests" permission.
 
-## Claude Code Integration
-
-[Claude Code](https://github.com/anthropics/claude-code) can be configured to use this router as its backend, allowing you to use GitHub Copilot models through Claude Code's interface.
-
-### Quick Launch (Recommended)
-
-The easiest way to use Claude Code with the router - no configuration needed:
-
-```bash
-gcr cc
-# or: gcr claude-code
-```
-
-This starts the router, launches Claude Code with the correct environment variables, and cleans up when you exit. All arguments are passed through:
-
-```bash
-gcr cc --resume
-gcr cc --dangerously-skip-permissions
-```
-
-### Manual Setup
-
-If you prefer to run the router separately:
-
-1. **Start the router** (keep it running in a terminal):
-   ```bash
-   gcr
-   ```
-
-2. **Configure Claude Code** by creating/editing `.claude/settings.json` in your project:
-
-   ```json
-   {
-    "env": {
-      "ANTHROPIC_BASE_URL": "http://localhost:7318",
-      "ANTHROPIC_AUTH_TOKEN": "not-required",
-      "ANTHROPIC_API_KEY": "",
-      "ANTHROPIC_DEFAULT_HAIKU_MODEL": "github-copilot/claude-haiku-4.5",
-      "ANTHROPIC_DEFAULT_SONNET_MODEL": "github-copilot/claude-sonnet-4.5",
-      "ANTHROPIC_DEFAULT_OPUS_MODEL": "github-copilot/claude-opus-4.5"
-    }
-   }
-   ```
-
-3. **Restart Claude Code** to pick up the new configuration.
-
-### Notes
-
-- `ANTHROPIC_AUTH_TOKEN` can be any non-empty string (authentication is handled by GitHub Copilot)
-- `ANTHROPIC_API_KEY` should be empty or omitted
-- Model names in the config should match models available in GitHub Copilot
-
-## OpenAI Codex Integration
-
-[OpenAI Codex CLI](https://github.com/openai/codex) can be configured to use this router as a custom model provider.
-
-### Quick Launch (Recommended)
-
-The easiest way to use Codex with the router - no configuration needed:
-
-```bash
-gcr cx
-# or: gcr codex
-```
-
-This starts the router, launches Codex with the correct provider configuration, and cleans up when you exit. All arguments are passed through:
-
-```bash
-gcr cx --model gpt-4o
-gcr cx --full-auto "fix the tests"
-```
-
-### Manual Setup
-
-If you prefer to run the router separately:
-
-1. **Start the router** (keep it running in a terminal):
-   ```bash
-   gcr
-   ```
-
-2. **Configure Codex CLI** by creating/editing `~/.codex/config.toml`:
-
-   ```toml
-   model = "gpt-5.2-codex"
-   model_provider = "proxy"
-
-   [model_providers.proxy]
-   name = "OpenAI using GitHub Copilot Router"
-   base_url = "http://localhost:7318/v1"
-   wire_api = "responses"
-   ```
-
-3. **Run Codex** as normal:
-   ```bash
-   codex
-   ```
-   It will now route requests through GitHub Copilot.
-
-### Notes
-
-- Model name should match a model available in GitHub Copilot (e.g., `gpt-5.2-codex`, `gpt-4o`, `claude-sonnet-4.5`)
-- No API key configuration needed - authentication is handled by GitHub Copilot
-
-## API Endpoints
-
-| Endpoint | Method | Format | Description |
-|----------|--------|--------|-------------|
-| `/v1/responses` | POST | OpenAI | Responses API (recommended) |
-| `/v1/responses/input_tokens` | POST | OpenAI | Token counting |
-| `/v1/chat/completions` | POST | OpenAI | Chat completions (legacy) |
-| `/v1/models` | GET | OpenAI | List available models |
-| `/v1/messages` | POST | Anthropic | Messages API |
-| `/v1/messages/count_tokens` | POST | Anthropic | Token counting |
-| `/health` | GET | - | Health check |
-
-> **Note:** The `/v1/responses` endpoint is the newer OpenAI Responses API format, which is recommended over `/v1/chat/completions`. Some clients like OpenAI Codex CLI use `wire_api = "responses"` configuration.
-
 ## Usage Examples
-
-### With curl (OpenAI format)
-
-```bash
-# Non-streaming
-curl http://localhost:7318/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-4o",
-    "messages": [{"role": "user", "content": "Hello!"}]
-  }'
-
-# Streaming
-curl http://localhost:7318/v1/chat/completions \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "gpt-4o",
-    "messages": [{"role": "user", "content": "Hello!"}],
-    "stream": true
-  }'
-```
-
-### With curl (Anthropic format)
-
-```bash
-curl http://localhost:7318/v1/messages \
-  -H "Content-Type: application/json" \
-  -d '{
-    "model": "claude-sonnet-4.5",
-    "max_tokens": 1024,
-    "messages": [{"role": "user", "content": "Hello!"}]
-  }'
-```
 
 ### With OpenAI Python SDK
 
@@ -245,6 +118,94 @@ response = client.messages.create(
 print(response.content[0].text)
 ```
 
+### With curl (OpenAI format)
+
+```bash
+# Non-streaming
+curl http://localhost:7318/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+
+# Streaming
+curl http://localhost:7318/v1/chat/completions \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "gpt-4o",
+    "messages": [{"role": "user", "content": "Hello!"}],
+    "stream": true
+  }'
+```
+
+### With curl (Anthropic format)
+
+```bash
+curl http://localhost:7318/v1/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4.5",
+    "max_tokens": 1024,
+    "messages": [{"role": "user", "content": "Hello!"}]
+  }'
+```
+
+## API Endpoints
+
+| Endpoint | Method | Format | Description |
+|----------|--------|--------|-------------|
+| `/v1/responses` | POST | OpenAI | Responses API (recommended) |
+| `/v1/responses/input_tokens` | POST | OpenAI | Token counting |
+| `/v1/chat/completions` | POST | OpenAI | Chat completions (legacy) |
+| `/v1/models` | GET | OpenAI | List available models |
+| `/v1/messages` | POST | Anthropic | Messages API |
+| `/v1/messages/count_tokens` | POST | Anthropic | Token counting |
+| `/health` | GET | - | Health check |
+
+## Use Cases
+
+**Works well for:**
+- Custom chatbots and Q&A systems
+- LangChain / LlamaIndex applications (chat mode only)
+- Chat UIs (Open WebUI, LibreChat, etc.)
+- Prototyping with multiple models
+- Any application using standard chat completion APIs
+
+**Does NOT work as expected for:**
+- Claude Code (its tools don't work; Copilot's tools run on the router's machine instead)
+- OpenAI Codex CLI (its tools don't work; Copilot's tools run on the router's machine instead)
+- Any agentic tool expecting client-side tool execution
+
+## Experimental: Claude Code & Codex Launchers
+
+> [!CAUTION]
+> **These launchers are experimental and have significant limitations.**
+>
+> Claude Code and Codex CLI expect to control file operations through their own tools. With this router:
+>
+> - **Their tools don't work** - tool calls are not passed back to the client
+> - **Copilot's tools run instead** - but they operate on the **router's directory**, not your project
+> - **Wrong directory problem** - if you ask to "edit src/index.ts", Copilot edits that file where the router is running, not where Claude Code/Codex is running
+>
+> **Workaround:** Run the router FROM your project directory: `cd /your/project && gcr cc`
+>
+> **For full functionality, use these tools with their official APIs.**
+
+### Claude Code Launcher
+
+```bash
+gcr cc
+# or: gcr claude-code
+```
+
+### Codex Launcher
+
+```bash
+gcr cx
+# or: gcr codex
+```
+
 ## Configuration
 
 ### CLI Commands
@@ -252,9 +213,9 @@ print(response.content[0].text)
 | Command | Description |
 |---------|-------------|
 | `gcr` | Start the router server |
-| `gcr claude-code` | Launch Claude Code through the router |
+| `gcr claude-code` | Launch Claude Code (limited - see warning above) |
 | `gcr cc` | Alias for `claude-code` |
-| `gcr codex` | Launch OpenAI Codex through the router |
+| `gcr codex` | Launch OpenAI Codex (limited - see warning above) |
 | `gcr cx` | Alias for `codex` |
 
 > **Note:** `copilot-router` is an alias for `gcr` (e.g., `copilot-router cc` works too).
@@ -271,6 +232,17 @@ print(response.content[0].text)
 |----------|---------|-------------|
 | `PORT` | `7318` | Server port |
 | `GITHUB_TOKEN` | - | GitHub PAT for authentication |
+
+## Limitations
+
+| Feature | Status |
+|---------|--------|
+| Chat completions | ✅ Supported |
+| Streaming | ✅ Supported |
+| Multi-turn conversations | ✅ Supported |
+| Tool/function calling | ❌ Not supported |
+| Vision/images | ❌ Not supported |
+| File attachments | ❌ Not supported |
 
 ## Troubleshooting
 
