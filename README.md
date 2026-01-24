@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/banner.png" alt="GitHub Copilot Router" width="100%">
+  <img src="https://github.com/ocmrz/copilot-router/raw/main/assets/banner.png" alt="GitHub Copilot Router" width="100%">
 </p>
 
 # GitHub Copilot Router
