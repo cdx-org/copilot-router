@@ -1,6 +1,15 @@
+<p align="center">
+  <img src="assets/banner.png" alt="GitHub Copilot Router" width="100%">
+</p>
+
 # GitHub Copilot Router
 
-An OpenAI & Anthropic compatible API router that proxies requests to GitHub Copilot SDK. This allows you to use GitHub Copilot as a backend for any client that supports OpenAI or Anthropic APIs, including **Claude Code**.
+<p align="center">
+  <strong>OpenAI & Anthropic API proxy for GitHub Copilot SDK</strong>
+</p>
+
+
+Use GitHub Copilot as a backend for any client that supports OpenAI or Anthropic APIs, including **Claude Code** and **OpenAI Codex**.
 
 ## Features
 
