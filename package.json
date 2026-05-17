@@ -36,11 +36,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/yatfuchan/github-copilot-router.git"
+    "url": "git+https://github.com/cdx-org/copilot-router.git"
   },
-  "homepage": "https://github.com/yatfuchan/github-copilot-router#readme",
+  "homepage": "https://github.com/cdx-org/copilot-router#readme",
   "bugs": {
-    "url": "https://github.com/yatfuchan/github-copilot-router/issues"
+    "url": "https://github.com/cdx-org/copilot-router/issues"
   },
   "author": "yatfuchan",
   "license": "MIT",

@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="https://github.com/ocmrz/copilot-router/raw/main/assets/banner.png" alt="GitHub Copilot Router" width="100%">
+  <img src="https://github.com/cdx-org/copilot-router/raw/main/assets/banner.png" alt="GitHub Copilot Router" width="100%">
 </p>
 
 # GitHub Copilot Router
 
 <p align="center">
-  <a href="https://github.com/ocmrz/github-copilot-router/blob/main/LICENSE">
+  <a href="https://github.com/cdx-org/copilot-router/blob/main/LICENSE">
     <img src="https://img.shields.io/npm/l/github-copilot-router" alt="License">
   </a>
   <a href="https://www.npmjs.com/package/github-copilot-router">
@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  OpenAI & Anthropic compatible chat proxy for GitHub Copilot models.
+  OpenAI and Anthropic compatible API router for GitHub Copilot models.
 </p>
 
 Use your existing GitHub Copilot subscription with standard OpenAI and Anthropic client libraries.
@@ -48,32 +48,44 @@ This router translates OpenAI and Anthropic API formats to GitHub Copilot SDK ca
 
 ## Quick Start
 
-1. **Install [GitHub Copilot CLI](https://github.com/github/copilot-cli)**
+1. **Install the router**
 
     ```bash
-    # macOS/Linux
-    brew install copilot-cli
-
-    # Windows
-    winget install GitHub.Copilot
-
-    # npm (macOS, Linux, and Windows)
-    npm install -g @github/copilot
-
+    npm install -g github-copilot-router
     ```
 
-2. **Authenticate**
+    Or run from source:
 
     ```bash
+    git clone https://github.com/cdx-org/copilot-router.git
+    cd copilot-router
+    npm install
+    npm run build
+    node dist/cli.js
+    ```
+
+2. **Authenticate GitHub Copilot**
+
+    Use either `GITHUB_TOKEN` or the GitHub Copilot CLI login flow.
+
+    ```bash
+    # Option A: PAT with Copilot Requests permission
+    export GITHUB_TOKEN=github_pat_xxxxxxxxxxxx
+    ```
+
+    ```bash
+    # Option B: GitHub Copilot CLI login
+    npm install -g @github/copilot
     copilot
     # Inside the CLI, type:
     /login
     ```
 
-3. **Install and run**
+    The router uses its bundled `@github/copilot` CLI server when available. Set `COPILOT_CLI_PATH` only if you need to point at a specific Copilot CLI executable.
+
+3. **Run**
 
     ```bash
-    npm install -g github-copilot-router
     gcr     # Start the router server
 
     # Launch supported clients through the router
@@ -81,7 +93,7 @@ This router translates OpenAI and Anthropic API formats to GitHub Copilot SDK ca
     gcr cx  # Launch OpenAI Codex
     ```
 
-    The server will start at `http://localhost:7318`.
+    The server starts at `http://localhost:7318`.
 
 > **Tip:** You can also authenticate via `GITHUB_TOKEN` environment variable with a [PAT](https://github.com/settings/personal-access-tokens/new) that has "Copilot Requests" permission.
 
@@ -98,7 +110,7 @@ client = OpenAI(
 )
 
 response = client.chat.completions.create(
-    model="gpt-4o",
+    model="gpt-4.1",
     messages=[{"role": "user", "content": "Hello!"}]
 )
 print(response.choices[0].message.content)
@@ -129,7 +141,7 @@ print(response.content[0].text)
 curl http://localhost:7318/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-4o",
+    "model": "gpt-4.1",
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
 
@@ -137,7 +149,7 @@ curl http://localhost:7318/v1/chat/completions \
 curl http://localhost:7318/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
-    "model": "gpt-4o",
+    "model": "gpt-4.1",
     "messages": [{"role": "user", "content": "Hello!"}],
     "stream": true
   }'
@@ -153,6 +165,67 @@ curl http://localhost:7318/v1/messages \
     "max_tokens": 1024,
     "messages": [{"role": "user", "content": "Hello!"}]
   }'
+```
+
+### Anthropic tool use
+
+Clients provide tool definitions in the request. The router returns `tool_use` blocks to the client; the client executes the tool and sends `tool_result` content in the next request.
+
+```bash
+curl http://localhost:7318/v1/messages \
+  -H "Content-Type: application/json" \
+  -d '{
+    "model": "claude-sonnet-4.5",
+    "max_tokens": 1024,
+    "tools": [
+      {
+        "name": "get_time",
+        "description": "Return the current local time",
+        "input_schema": {
+          "type": "object",
+          "properties": {
+            "timezone": { "type": "string" }
+          },
+          "required": ["timezone"]
+        }
+      }
+    ],
+    "messages": [
+      {
+        "role": "user",
+        "content": "Use get_time for Asia/Seoul."
+      }
+    ]
+  }'
+```
+
+### Claude Code through the router
+
+```bash
+gcr cc --model claude-sonnet-4.5
+```
+
+For a non-interactive smoke test:
+
+```bash
+gcr cc --bare -p "Say exactly ROUTER_OK" \
+  --model claude-sonnet-4.5 \
+  --output-format text \
+  --no-session-persistence \
+  --tools ""
+```
+
+For a client-side Bash tool smoke test:
+
+```bash
+gcr cc --bare -p "Use Bash to run: echo ROUTER_TOOL_OK" \
+  --model claude-sonnet-4.5 \
+  --output-format stream-json \
+  --verbose \
+  --no-session-persistence \
+  --tools Bash \
+  --allowedTools Bash \
+  --permission-mode bypassPermissions
 ```
 
 ## API Endpoints
@@ -228,9 +301,12 @@ gcr cx
 
 **Options:**
 
-- `--port, -p <port>` - Port for the router (default: 7318)
+- `--port, -p <port>` - Port for the router when starting the server (default: 7318)
+- `--port <port>` - Router port for launcher subcommands such as `gcr cc --port 8080 ...`
 - `--help, -h` - Show help
 - `--version, -v` - Show version
+
+For launcher subcommands, short flags are passed through to the launched CLI. For example, `gcr cc -p "hello"` uses Claude Code's `-p/--print`, not the router port option.
 
 ### Environment Variables
 
@@ -238,6 +314,7 @@ gcr cx
 |----------|---------|-------------|
 | `PORT` | `7318` | Server port |
 | `GITHUB_TOKEN` | - | GitHub PAT for authentication |
+| `COPILOT_CLI_PATH` | bundled `@github/copilot` when available, otherwise `copilot` | Override the Copilot CLI executable used by the SDK |
 
 ## Limitations
 
@@ -259,11 +336,28 @@ gcr cx
 
 You're not authenticated with GitHub Copilot. Follow the authentication steps above.
 
+### Claude Code asks for Anthropic auth
+
+Use the launcher (`gcr cc` or `copilot-router cc`) so the router sets `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, and a non-empty dummy `ANTHROPIC_API_KEY` for Claude Code.
+
+If you launch Claude Code manually, set:
+
+```bash
+export ANTHROPIC_BASE_URL=http://localhost:7318
+export ANTHROPIC_API_KEY=copilot-router
+```
+
+### "Quota exceeded" from Copilot
+
+This comes from the upstream GitHub Copilot service or account limits. The router returns it as an API error; retry later or check the Copilot plan/account status.
+
 ### "copilot" command shows AWS Copilot
 
-You have AWS Copilot installed which conflicts with GitHub Copilot CLI. Either:
+You have AWS Copilot installed which conflicts with GitHub Copilot CLI. The router prefers its bundled `@github/copilot` dependency when available. If you override `COPILOT_CLI_PATH` or rely on PATH, either:
+
 - Uninstall both GitHub Copilot and AWS Copilot: `brew uninstall copilot-cli`, and then install GitHub Copilot again.
-- Or ensure GitHub Copilot CLI is first in your PATH
+- Ensure GitHub Copilot CLI is first in your PATH.
+- Set `COPILOT_CLI_PATH` to the intended GitHub Copilot CLI executable.
 
 ## License
 
