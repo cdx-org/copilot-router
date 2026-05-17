@@ -19,14 +19,16 @@
 
 Use your existing GitHub Copilot subscription with standard OpenAI and Anthropic client libraries.
 
-> [!WARNING]
-> **This is a chat completion proxy, not a full API replacement.**
+> [!NOTE]
+> **This is a compatibility proxy for Copilot-backed models.**
 >
-> - **Tool/function calling is NOT passed through** - client tool definitions are ignored
-> - **Copilot has its own tools** - file operations happen on the **router's machine/directory**, not the client's
-> - **Claude Code/Codex tools don't work** - their file/shell tools never get invoked; Copilot's tools run instead
+> - **Client-side tool/function calling is supported** when the request supplies tool definitions
+> - **Anthropic Messages tool use is supported** for `tool_use` / `tool_result`, including Claude Code-style streaming
+> - **OpenAI tool/function calls are supported** for Chat Completions and Responses API clients
+> - **Tool results are statelessly summarized** into the next Copilot prompt
+> - **Client tools run on the client side**; the router does not execute Claude Code/Codex file or shell tools
 > - **Best for:** Chat applications, simple completions, Q&A bots, prototyping
-> - **Not for:** Agentic coding assistants expecting client-side tool execution
+> - **Compatibility target:** Agentic clients that own their own tools, including Claude Code
 
 ## What This Does
 
@@ -35,12 +37,14 @@ This router translates OpenAI and Anthropic API formats to GitHub Copilot SDK ca
 - Use `openai` and `anthropic` Python/JS libraries with Copilot models
 - Access Claude, GPT, and Gemini models through your Copilot subscription
 - Build chat applications without managing multiple API keys
+- Run client-owned tools through Anthropic/OpenAI-compatible tool-call responses
 
 ## What This Does NOT Do
 
-- Pass through tool/function calls to clients (Copilot executes tools server-side instead)
-- Let Claude Code/Codex control file operations (Copilot's tools run in the router's directory)
-- Replace direct API access for agentic tools that need client-side tool execution
+- Provide a byte-for-byte replacement for Anthropic/OpenAI APIs
+- Preserve durable Copilot conversation state across process restarts
+- Execute client tools inside the router process
+- Support vision/image inputs or file attachments as native API payloads
 
 ## Quick Start
 
@@ -72,7 +76,7 @@ This router translates OpenAI and Anthropic API formats to GitHub Copilot SDK ca
     npm install -g github-copilot-router
     gcr     # Start the router server
 
-    # Deprecated
+    # Launch supported clients through the router
     gcr cc  # Launch Claude Code
     gcr cx  # Launch OpenAI Codex
     ```
@@ -171,26 +175,28 @@ curl http://localhost:7318/v1/messages \
 - Chat UIs (Open WebUI, LibreChat, etc.)
 - Prototyping with multiple models
 - Any application using standard chat completion APIs
+- Claude Code via Anthropic `/v1/messages` with client-side tools
 
-**Does NOT work as expected for:**
-- Claude Code (its tools don't work; Copilot's tools run on the router's machine instead)
-- OpenAI Codex CLI (its tools don't work; Copilot's tools run on the router's machine instead)
-- Any agentic tool expecting client-side tool execution
+**Compatibility-focused for:**
+- OpenAI Codex CLI
+- Any agentic tool expecting exact Anthropic/OpenAI streaming semantics
 
-## Deprecated: Claude Code & Codex Launchers
+## Claude Code & Codex Launchers
 
-> [!CAUTION]
-> **These launchers are deprecated and have significant limitations.**
+> [!NOTE]
+> **Client-side tools are passed back to the launched CLI.**
 >
 > Claude Code and Codex CLI expect to control file operations through their own tools. With this router:
 >
-> - **Their tools don't work** - tool calls are not passed back to the client
-> - **Copilot's tools run instead** - but they operate on the **router's directory**, not your project
-> - **Wrong directory problem** - if you ask to "edit src/index.ts", Copilot edits that file where the router is running, not where Claude Code/Codex is running
+> - Anthropic `/v1/messages` tools are returned as `tool_use` content blocks and client `tool_result` history is accepted
+> - Anthropic streaming emits Claude Code-compatible `content_block_start`, `input_json_delta`, `content_block_stop`, and `message_delta` events
+> - OpenAI Responses `function_call`, `local_shell_call`, `shell_call`, and `apply_patch_call` items are passed back to the client
+> - OpenAI Chat Completions tool calls are returned through `tool_calls`
+> - Tool result history is converted back into prompt text for the next Copilot request
+> - OpenAI Responses `previous_response_id` is supported with an in-memory response store
+> - If a request supplies no client tools, the router creates the Copilot session with no available tools
 >
-> **Workaround:** Run the router FROM your project directory: `cd /your/project && gcr cc`
->
-> **For full functionality, use these tools with their official APIs.**
+> The router still uses Copilot as the upstream model provider, so vendor-specific behavior can differ from direct Anthropic/OpenAI APIs.
 
 ### Claude Code Launcher
 
@@ -213,9 +219,9 @@ gcr cx
 | Command | Description |
 |---------|-------------|
 | `gcr` | Start the router server |
-| `gcr claude-code` | Launch Claude Code (limited - see warning above) |
+| `gcr claude-code` | Launch Claude Code through Anthropic `/v1/messages` |
 | `gcr cc` | Alias for `claude-code` |
-| `gcr codex` | Launch OpenAI Codex (limited - see warning above) |
+| `gcr codex` | Launch OpenAI Codex through Responses API |
 | `gcr cx` | Alias for `codex` |
 
 > **Note:** `copilot-router` is an alias for `gcr` (e.g., `copilot-router cc` works too).
@@ -240,7 +246,10 @@ gcr cx
 | Chat completions | ✅ Supported |
 | Streaming | ✅ Supported |
 | Multi-turn conversations | ✅ Supported |
-| Tool/function calling | ❌ Not supported |
+| Tool/function calling | ✅ Client-side passthrough |
+| Anthropic `tool_use` / `tool_result` | ✅ Supported |
+| OpenAI Chat `tool_calls` | ✅ Supported |
+| OpenAI Responses function/local shell/apply patch calls | ✅ Supported |
 | Vision/images | ❌ Not supported |
 | File attachments | ❌ Not supported |
 

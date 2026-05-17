@@ -16,6 +16,7 @@ export interface ChatCompletionRequest {
   user?: string;
   tools?: OpenAITool[];
   tool_choice?: "none" | "auto" | "required" | { type: "function"; function: { name: string } };
+  parallel_tool_calls?: boolean;
 }
 
 export interface ChatMessage {
@@ -79,9 +80,25 @@ export interface ChatCompletionChunk {
 
 export interface ChatCompletionChunkChoice {
   index: number;
-  delta: Partial<ChatMessage>;
+  delta: ChatCompletionChunkDelta;
   logprobs: null;
   finish_reason: "stop" | "length" | "tool_calls" | "content_filter" | null;
+}
+
+export interface ChatCompletionChunkDelta {
+  role?: "assistant";
+  content?: string | null;
+  tool_calls?: ChatCompletionChunkToolCall[];
+}
+
+export interface ChatCompletionChunkToolCall {
+  index: number;
+  id?: string;
+  type?: "function";
+  function?: {
+    name?: string;
+    arguments?: string;
+  };
 }
 
 // Models endpoint types

@@ -120,7 +120,7 @@ export async function launchClaudeCode(options: LaunchOptions): Promise<number> 
     ...process.env as Record<string, string>,
     ANTHROPIC_BASE_URL: `http://localhost:${port}`,
     ANTHROPIC_AUTH_TOKEN: "copilot-router",
-    ANTHROPIC_API_KEY: "",
+    ANTHROPIC_API_KEY: "copilot-router",
   };
 
   console.log("Launching Claude Code...\n");

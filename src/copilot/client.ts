@@ -6,12 +6,35 @@ import {
   CopilotClient,
   type CopilotSession,
   type ModelInfo,
+  type Tool as CopilotTool,
   type CopilotClientOptions as SDKClientOptions,
 } from "@github/copilot-sdk";
+import { existsSync } from "node:fs";
+import { dirname, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 
 // Singleton client instance
 let clientInstance: CopilotClient | null = null;
 let clientStartPromise: Promise<void> | null = null;
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function resolveCopilotCliPath(): string {
+  if (process.env["COPILOT_CLI_PATH"]) {
+    return process.env["COPILOT_CLI_PATH"];
+  }
+
+  const bundledCliPath = resolve(
+    __dirname,
+    "../../node_modules/@github/copilot/npm-loader.js",
+  );
+
+  if (existsSync(bundledCliPath)) {
+    return bundledCliPath;
+  }
+
+  return "copilot";
+}
 
 // Re-export ModelInfo for use in routes
 export type { ModelInfo };
@@ -32,6 +55,7 @@ export async function getCopilotClient(
   }
 
   clientInstance = new CopilotClient({
+    cliPath: resolveCopilotCliPath(),
     logLevel: options.logLevel ?? "warning",
     autoRestart: options.autoRestart ?? true,
   });
@@ -90,15 +114,20 @@ export async function createSession(
   model: string,
   streaming: boolean,
   systemMessage?: string,
+  tools?: CopilotTool[],
+  availableTools?: string[],
+  systemMode: "append" | "replace" = "replace",
 ): Promise<CopilotSession> {
   const client = await getCopilotClient();
 
   const session = await client.createSession({
     model,
     streaming,
+    ...(tools && tools.length > 0 && { tools }),
+    ...(availableTools !== undefined && { availableTools }),
     ...(systemMessage && {
       systemMessage: {
-        mode: "append",
+        mode: systemMode,
         content: systemMessage,
       },
     }),

@@ -112,8 +112,9 @@ function handleServer(args: string[]): void {
 }
 
 function handleClaudeCode(args: string[]): void {
-  // Extract port if specified
-  const portIndex = args.findIndex((arg) => arg === "--port" || arg === "-p");
+  // Extract router port if specified. Keep "-p" available for Claude Code's
+  // own print shorthand.
+  const portIndex = args.findIndex((arg) => arg === "--port");
   let port: number | undefined;
   let passthroughArgs = args;
 
@@ -138,8 +139,8 @@ function handleClaudeCode(args: string[]): void {
 }
 
 function handleCodex(args: string[]): void {
-  // Extract port if specified
-  const portIndex = args.findIndex((arg) => arg === "--port" || arg === "-p");
+  // Extract router port if specified. Short flags belong to the launched CLI.
+  const portIndex = args.findIndex((arg) => arg === "--port");
   let port: number | undefined;
   let passthroughArgs = args;
 
