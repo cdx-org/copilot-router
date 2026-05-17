@@ -338,7 +338,7 @@ You're not authenticated with GitHub Copilot. Follow the authentication steps ab
 
 ### Claude Code asks for Anthropic auth
 
-Use the launcher (`gcr cc` or `copilot-router cc`) so the router sets `ANTHROPIC_BASE_URL`, `ANTHROPIC_AUTH_TOKEN`, and a non-empty dummy `ANTHROPIC_API_KEY` for Claude Code.
+Use the launcher (`gcr cc` or `copilot-router cc`) so the router sets `ANTHROPIC_BASE_URL` and a non-empty dummy `ANTHROPIC_API_KEY` for Claude Code.
 
 If you launch Claude Code manually, set:
 

@@ -7,6 +7,7 @@ import {
   type CopilotSession,
   type ModelInfo,
   type Tool as CopilotTool,
+  type PermissionHandler,
   type CopilotClientOptions as SDKClientOptions,
 } from "@github/copilot-sdk";
 import { existsSync } from "node:fs";
@@ -18,6 +19,17 @@ let clientInstance: CopilotClient | null = null;
 let clientStartPromise: Promise<void> | null = null;
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
+
+const denyRouterPermissionRequest: PermissionHandler = () => ({
+  kind: "user-not-available",
+});
+
+export function normalizeCopilotModelId(model: string): string {
+  return model.replace(
+    /^(claude-(?:haiku|sonnet|opus)-\d+)-(\d+)$/,
+    "$1.$2",
+  );
+}
 
 function resolveCopilotCliPath(): string {
   if (process.env["COPILOT_CLI_PATH"]) {
@@ -119,10 +131,12 @@ export async function createSession(
   systemMode: "append" | "replace" = "replace",
 ): Promise<CopilotSession> {
   const client = await getCopilotClient();
+  const normalizedModel = normalizeCopilotModelId(model);
 
   const session = await client.createSession({
-    model,
+    model: normalizedModel,
     streaming,
+    onPermissionRequest: denyRouterPermissionRequest,
     ...(tools && tools.length > 0 && { tools }),
     ...(availableTools !== undefined && { availableTools }),
     ...(systemMessage && {

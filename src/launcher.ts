@@ -66,11 +66,12 @@ function startRouter(port: number): ChildProcess {
     [indexPath],
     {
       env: { ...process.env, PORT: String(port) },
-      stdio: ["ignore", "pipe", "pipe"],
+      stdio: ["ignore", "ignore", "pipe"],
     }
   );
 
-  // Forward router stderr for debugging (but not stdout to avoid noise)
+  // Forward router stderr for debugging. Router stdout is ignored so request
+  // logs cannot fill an unread pipe and stall the child process.
   routerProcess.stderr?.on("data", (data: Buffer) => {
     const line = data.toString().trim();
     if (line) {
@@ -119,9 +120,9 @@ export async function launchClaudeCode(options: LaunchOptions): Promise<number> 
   const claudeEnv: Record<string, string> = {
     ...process.env as Record<string, string>,
     ANTHROPIC_BASE_URL: `http://localhost:${port}`,
-    ANTHROPIC_AUTH_TOKEN: "copilot-router",
     ANTHROPIC_API_KEY: "copilot-router",
   };
+  delete claudeEnv["ANTHROPIC_AUTH_TOKEN"];
 
   console.log("Launching Claude Code...\n");
 

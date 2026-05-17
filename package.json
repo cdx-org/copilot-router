@@ -45,7 +45,7 @@
   "author": "yatfuchan",
   "license": "MIT",
   "dependencies": {
-    "@github/copilot-sdk": "^0.1.17",
+    "@github/copilot-sdk": "^0.3.0",
     "@hono/node-server": "^1.13.7",
     "cross-spawn": "^7.0.6",
     "hono": "^4.6.14",

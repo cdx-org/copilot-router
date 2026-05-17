@@ -4,7 +4,11 @@
 
 import { Hono } from "hono";
 import type { ModelsResponse, Model } from "../types/openai.js";
-import { listAvailableModels, type ModelInfo } from "../copilot/client.js";
+import {
+  listAvailableModels,
+  normalizeCopilotModelId,
+  type ModelInfo,
+} from "../copilot/client.js";
 
 const models = new Hono();
 
@@ -67,12 +71,13 @@ models.get("/", async (c) => {
  */
 models.get("/:model", async (c) => {
   const modelId = c.req.param("model");
+  const normalizedModelId = normalizeCopilotModelId(modelId);
 
   try {
     const copilotModels = await getCachedModels();
     const createdAt = Math.floor(Date.now() / 1000);
 
-    const foundModel = copilotModels.find((m) => m.id === modelId);
+    const foundModel = copilotModels.find((m) => m.id === normalizedModelId);
 
     if (!foundModel) {
       return c.json(
